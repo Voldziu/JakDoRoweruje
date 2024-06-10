@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="" id="coords_form">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.start_lat.label }}<br>
+            {{ form.start_lat(size=32) }}
+        </p>
+        <p>
+            {{ form.start_lon.label }}<br>
+            {{ form.start_lon(size=32) }}
+        </p>
+        <p>
+            {{ form.end_lat.label }}<br>
+            {{ form.end_lat(size=32) }}
+        </p>
+        <p>
+            {{ form.end_lon.label }}<br>
+            {{ form.end_lon(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <div id="map" style="height: 500px;"></div>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}
