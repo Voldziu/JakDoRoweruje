@@ -1,8 +1,9 @@
-html, body, .container {
-    height: 100%;
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
+
 
 .container {
     display: flex;
@@ -11,4 +12,18 @@ html, body, .container {
 
 #map {
     flex-grow: 1;
+}
+
+#coords_form {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+#coords_form p {
+    margin: 0 0 10px 0;
 }
