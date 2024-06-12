@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to fetch address hints from OpenStreetMap Nominatim API
     function fetchAddressHints(input, container) {
-        var value = input.value;
+        var value = input.value +", "+CityName;
         if (value.length > 2) {
             clearTimeout(input.timer);
 
@@ -121,8 +121,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
 
-                    L.marker([start_coords[0], start_coords[1]], { icon: L.icon({ iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png' }) }).addTo(map).bindPopup('Start').openPopup();
-                    L.marker([end_coords[0], end_coords[1]], { icon: L.icon({ iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-red.png' }) }).addTo(map).bindPopup('End').openPopup();
+                    L.marker([start_coords[0], start_coords[1]], { icon: L.icon({ iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' }) }).addTo(map).bindPopup('Start').openPopup();
+                    L.marker([end_coords[0], end_coords[1]], { icon: L.icon({ iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }) }).addTo(map).bindPopup('End').openPopup();
                     L.polyline(route, { color: 'blue' }).addTo(map);
                     map.fitBounds(route);
                 }
