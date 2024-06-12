@@ -1,0 +1,2 @@
+docker build . -t flask:0.0.1
+docker run -d -p 5002:5000 flask:0.0.1
