@@ -1,6 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-    var map = L.map('map', {zoomControl: false}).setView([51.1097, 17.0316], 14);
+    var map = L.map('map', {zoomControl: false}).setView(WroclawCoordinates, 14);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,

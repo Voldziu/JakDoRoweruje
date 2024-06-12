@@ -15,5 +15,6 @@
         <p>{{ form.submit() }}</p>
     </form>
     <div id="map" style="height: 100vh;"></div>
+    <script src="{{ url_for('static', filename='js/mapCoordinates.js') }}"></script>
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}
