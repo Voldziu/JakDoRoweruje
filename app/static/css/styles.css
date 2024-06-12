@@ -4,12 +4,6 @@
     box-sizing: border-box;
 }
 
-
-.container {
-    display: flex;
-    flex-direction: column;
-}
-
 #map {
     flex-grow: 1;
 }
@@ -27,3 +21,4 @@
 #coords_form p {
     margin: 0 0 10px 0;
 }
+

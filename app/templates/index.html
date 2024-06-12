@@ -3,18 +3,23 @@
 {% block content %}
     <form action="" id="coords_form">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.start_point.label }}<br>
-            {{ form.start_point(size=32) }}
-        </p>
-        <p>
-            {{ form.end_point.label }}<br>
-            {{ form.end_point(size=32) }}
-        </p>
-
+        <div>
+            <label for="start-address">{{ form.start_point.label }}</label><br>
+            {{ form.start_point(size=32, class="address-input", id="start-address") }}
+        </div>
+        <div class=address-hints-container >
+            <table id="address-hints-start" class="address-suggestions-table"></table> <!-- Empty table for start address suggestions -->
+        </div>
+        <div>
+            <label for="end-address">{{ form.end_point.label }}</label><br>
+            {{ form.end_point(size=32, class="address-input", id="end-address") }}
+        </div>
+        <div class=address-hints-container>
+            <table id="address-hints-end" class="address-suggestions-table"></table> <!-- Empty table for end address suggestions -->
+        </div>
         <p>{{ form.submit() }}</p>
     </form>
-    <div id="map" style="height: 100vh;"></div>
-    <script src="{{ url_for('static', filename='js/mapCoordinates.js') }}"></script>
+    <div id="map" style="height: 600px;"></div>
+    <script src="{{ url_for('static', filename='js/Constants.js') }}"></script>
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}
