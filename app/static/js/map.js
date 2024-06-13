@@ -11,22 +11,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to fetch address hints from OpenStreetMap Nominatim API
     function fetchAddressHints(input, container) {
-        var value = input.value +", "+CityName;
+       // console.log(50);
+
+        var value = input.value;
+
         if (value.length > 2) {
+           // console.log(value);
             clearTimeout(input.timer);
 
         // Set a new timer to fetch suggestions after 500 milliseconds (0.5 seconds)
         input.timer = setTimeout(function() {
-            var url = `https://nominatim.openstreetmap.org/search?q=${value}&format=json&addressdetails=1&limit=5`;
-            fetch(url)
-                .then(response => response.json())
+
+            fetch('/suggestions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: value })
+                })
+                .then(response => {
+                   // console.log("Response status:", response.status);  // Debug print
+                    return response.json();
+                })
                 .then(data => {
-                    displaySuggestions(container, data, input);
+                   // console.log("Suggestions data:", data);  // Debug print
+                    displaySuggestions(container, data.suggestions, input);
                 })
                 .catch(error => {
-                    console.error('Error fetching address hints:', error);
+                    //console.error('Error fetching address hints:', error);
                 });
-        }, 500);
+            }, 500);
     } else {
         hideSuggestions(container);
         clearTimeout(input.timer);
@@ -38,10 +52,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Clear previous suggestions
     container.innerHTML = '';
 
-    // Create a table element
-    // Iterate over suggestions and create table rows
-    suggestions.forEach(function (suggestion) {
-        var address = suggestion.display_name;
+
+    suggestions.forEach(function (address) {
         // here we can process address a bit
 
         // Create table row

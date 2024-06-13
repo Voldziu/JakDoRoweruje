@@ -1,0 +1,1 @@
+CityName = "Wrocław"
