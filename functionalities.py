@@ -72,3 +72,33 @@ def find_n_nearest_stations(coords, n, end_station=False):
 
     sorted_stations = sorted(stations_list, key=lambda x: x[4])
     return sorted_stations[:n]
+
+
+def get_nearest_stations(start_point, end_point):
+    start_coords = geocode(start_point)
+    end_coords = geocode(end_point)
+
+    nearest_stations_start = find_n_nearest_stations(start_coords, 5)
+    nearest_stations_finish = find_n_nearest_stations(end_coords, 5)
+
+    start_stations = [
+        {
+            'station_name': station[0],
+            'station_lat': station[1],
+            'station_lng': station[2],
+            'bikes_available': station[3],
+            'distance': station[4]
+        } for station in nearest_stations_start
+    ]
+
+    end_stations = [
+        {
+            'station_name': station[0],
+            'station_lat': station[1],
+            'station_lng': station[2],
+            'bikes_available': station[3],
+            'distance': station[4]
+        } for station in nearest_stations_finish
+    ]
+
+    return {'start_stations': start_stations, 'end_stations': end_stations}
