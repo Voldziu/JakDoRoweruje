@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
         position: 'bottomleft'
     }).addTo(map);
 
+
     // Function to fetch address hints from OpenStreetMap Nominatim API
     function fetchAddressHints(input, container) {
        // console.log(50);
-
         var value = input.value;
 
         if (value.length > 2) {
@@ -84,9 +84,17 @@ document.addEventListener('DOMContentLoaded', function () {
     container.style.display = 'none';
 }
 
+    var startMarker, endMarker;
+    var stationMarkers = [];
+    var form = document.getElementById('coords_form');
+    // var startAddressInput = document.getElementById('start-address');
+    // var endAddressInput = document.getElementById('end-address');
+    var startAddressInput = form.elements['start_point'];
+    var endAddressInput = form.elements['end_point'];
+    var searchButton = document.getElementById('search_button');
+    var findRouteButton = document.getElementById('find_route_button');
     // Address autocomplete for start and end points
-    var startAddressInput = document.getElementById('start-address');
-    var endAddressInput = document.getElementById('end-address');
+
     var startAddressHints = document.getElementById('address-hints-start');
     var endAddressHints = document.getElementById('address-hints-end');
 
@@ -99,13 +107,72 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    // Form submission and route calculation
-    var form = document.getElementById('coords_form');
+
+    searchButton.addEventListener('click', function (e) {
+        var startPoint = form.elements['start_point'].value;
+        var endPoint = form.elements['end_point'].value;
+
+        fetch('/nearest_stations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                start_point: startPoint,
+                end_point: endPoint
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                clearMarkers();
+
+                data.start_stations.forEach(station => {
+                    var marker = L.marker([station.station_lat, station.station_lng]).addTo(map)
+                        .bindPopup(`Start Station: ${station.station_name}`)
+                        .on('click', function () {
+                            if (startMarker) {
+                                map.removeLayer(startMarker);
+                            }
+                            startMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png'})}).addTo(map).bindPopup('Start').openPopup();
+                            checkMarkers();
+                        });
+                    stationMarkers.push(marker);
+                });
+
+                data.end_stations.forEach(station => {
+                    var marker = L.marker([station.station_lat, station.station_lng]).addTo(map)
+                        .bindPopup(`End Station: ${station.station_name}`)
+                        .on('click', function () {
+                            if (endMarker) {
+                                map.removeLayer(endMarker);
+                            }
+                            endMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-red.png'})}).addTo(map).bindPopup('End').openPopup();
+                            checkMarkers();
+                        });
+                    stationMarkers.push(marker);
+                });
+            }
+        });
+    });
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
+
         var start_point = startAddressInput.value;
         var end_point = endAddressInput.value;
+
+        if (!startMarker || !endMarker) {
+            alert("Please select both start and end stations.");
+            return;
+        }
+
+        var start_coords = [startMarker.getLatLng().lat, startMarker.getLatLng().lng];
+        var end_coords = [endMarker.getLatLng().lat, endMarker.getLatLng().lng];
+
 
         fetch('/route', {
             method: 'POST',
@@ -113,8 +180,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                start_point: start_point,
-                end_point: end_point
+                start_coords: start_coords,
+                end_coords: end_coords
             })
         })
             .then(response => response.json())
@@ -132,12 +199,32 @@ document.addEventListener('DOMContentLoaded', function () {
                             map.removeLayer(layer);
                         }
                     });
+                    clearMarkers();
 
-                    L.marker([start_coords[0], start_coords[1]], { icon: L.icon({ iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' }) }).addTo(map).bindPopup('Start').openPopup();
-                    L.marker([end_coords[0], end_coords[1]], { icon: L.icon({ iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' }) }).addTo(map).bindPopup('End').openPopup();
-                    L.polyline(route, { color: 'blue' }).addTo(map);
+                     startMarker = L.marker([start_coords[0], start_coords[1]], {icon: L.icon({iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png'})}).addTo(map).bindPopup('Start').openPopup();
+                    endMarker = L.marker([end_coords[0], end_coords[1]], {icon: L.icon({iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-red.png'})}).addTo(map).bindPopup('End').openPopup();
+                    L.polyline(route, {color: 'blue'}).addTo(map);
                     map.fitBounds(route);
+
+
                 }
             });
     });
+
+
+
+
+    function clearMarkers() {
+        stationMarkers.forEach(marker => map.removeLayer(marker));
+        stationMarkers = [];
+    }
+
+    function checkMarkers() {
+        if (startMarker && endMarker) {
+            findRouteButton.style.display = 'block';
+        } else {
+            findRouteButton.style.display = 'none';
+        }
+    }
 });
+
