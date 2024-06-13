@@ -15,11 +15,14 @@ def index():
 @app.route('/nearest_stations', methods=['POST'])
 def nearest_stations():
     data = request.get_json()
+    print(data)
     start_point = data['start_point']
     end_point = data['end_point']
+    print(start_point)
+    print(end_point)
 
     nearest_stations = get_nearest_stations(start_point, end_point)
-
+    print(nearest_stations)
     return jsonify(nearest_stations)
 
 

@@ -1,6 +1,6 @@
-<<<<<<< HEAD
+
 docker build . -t flask:0.0.1
 docker run -d -p 5002:5000 flask:0.0.1
-=======
+
 żeby zainicjować w ogóle u siebie bazę danych musisz zrobić: flask db init  potem flask db migrate -m "Stations table"   i na koniec  flask db upgrade
->>>>>>> 34c04c946423fb3016b1c8c888afcad1aa307a85
+

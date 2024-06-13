@@ -16,6 +16,7 @@ def update_database():
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
+        #print(f'updated_database: {data}')
         if 'countries' in data and data['countries']:
             wroclaw_data = data['countries'][0]['cities'][0]['places']
             with app.app_context():
@@ -26,7 +27,7 @@ def update_database():
                     if station_name in existing_stations:
                         station = existing_stations[station_name]
                         station.available_bikes = place.get('bikes', 0)
-                        print("Updating")
+                        #print("Updating")
 
                     else:
                         station = Stations(station_name=station_name, station_lat=place['lat'],
@@ -43,9 +44,9 @@ def update_database():
 
 def geocode(address):
     url = 'https://nominatim.openstreetmap.org/search'
-    processed_addres = process_addres(address)
+
     params = {
-        'q': processed_addres,
+        'q': address,
         'format': 'json',
         'limit': 1
     }
@@ -59,12 +60,16 @@ def geocode(address):
         return [float(data[0]['lat']), float(data[0]['lon'])]
     else:
         return None
-def process_addres(address):
-    print(address)
-    if re.search(r', Wrocław$', address):
-        print("String ends with ', Wrocław'")
-    else:
-        print("String does not end with ', Wrocław'")
+
+
+# def process_addres(address):
+#     print(address)
+#     if re.search(r', Wrocław$', address):
+#         print("String ends with ', Wrocław'")
+#     else:
+#         print("String does not end with ', Wrocław'")
+#
+#     return address
 
 def find_n_nearest_stations(coords, n, end_station=False):
     stations = Stations.query.all()
@@ -85,6 +90,7 @@ def find_n_nearest_stations(coords, n, end_station=False):
 def get_nearest_stations(start_point, end_point):
     start_coords = geocode(start_point)
     end_coords = geocode(end_point)
+    print(start_coords)
 
     nearest_stations_start = find_n_nearest_stations(start_coords, 5)
     nearest_stations_finish = find_n_nearest_stations(end_coords, 5)
