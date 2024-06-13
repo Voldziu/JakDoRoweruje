@@ -1,0 +1,1 @@
+żeby zainicjować w ogóle u siebie bazę danych musisz zrobić: flask db init  potem flask db migrate -m "Stations table"   i na koniec  flask db upgrade
