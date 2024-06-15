@@ -3,7 +3,7 @@ from app import app
 from flask import render_template, request, jsonify
 from forms import DirectionsForm
 import requests
-from functionalities import get_nearest_stations
+from functionalities import get_nearest_stations,route_from_a_to_b
 from app.models import Stations
 
 
@@ -29,34 +29,28 @@ def nearest_stations():
 @app.route('/route', methods=['POST'])
 def route():
     data = request.get_json()
+    start_coords_station = data['start_coords_station']
+    end_coords_station = data['end_coords_station']
     start_coords = data['start_coords']
     end_coords = data['end_coords']
 
-    start_station = Stations.query.filter_by(station_lat=start_coords[0], station_len=start_coords[1]).first()
-    end_station = Stations.query.filter_by(station_lat=end_coords[0], station_len=end_coords[1]).first()
+    from_start_to_start_station_dict= route_from_a_to_b(start_coords,start_coords_station,"foot")
+    from_start_station_to_end_station_dict = route_from_a_to_b(start_coords_station,end_coords_station,"bike")
+    from_end_station_to_end_dict = route_from_a_to_b(end_coords_station, end_coords, "foot")
+    return jsonify({
+        "from_start_to_start_station_dict": from_start_to_start_station_dict,
+        "from_start_station_to_end_station_dict":from_start_station_to_end_station_dict,
+        "from_end_station_to_end_dict": from_end_station_to_end_dict
 
-    api_key = "73aa3aa2-b205-461e-b88d-1727f0410895"
-    graphhopper_url = f"https://graphhopper.com/api/1/route?point={start_station.station_lat},{start_station.station_len}&point={end_station.station_lat},{end_station.station_len}&vehicle=bike&locale=pl&key={api_key}&points_encoded=false"
-    response = requests.get(graphhopper_url)
-    data = response.json()
+    })
 
-    if response.status_code == 200 and 'paths' in data:
-        route = data['paths'][0]['points']['coordinates']
-        route_coords = [[lat, lon] for lon, lat in route]
-        return jsonify({
-            'route': route_coords,
-            'start_coords': [start_station.station_lat, start_station.station_len],
-            'end_coords': [end_station.station_lat, end_station.station_len]
-        })
-    else:
-        return jsonify({'error': 'Error fetching route data'}), response.status_code
+
 
 
 @app.route('/suggestions', methods=["POST"])
 def suggestions():
     data = request.get_json()
     query = data.get('query', '')
-    suggestions = []
     if query:
         url = 'https://nominatim.openstreetmap.org/search'
         params = {
@@ -71,8 +65,8 @@ def suggestions():
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         data = response.json()
-        suggestions = [item['display_name'] for item in data]
+
 
     #print(suggestions)
 
-    return jsonify(suggestions =suggestions)
+    return jsonify(suggestions_raw =data)

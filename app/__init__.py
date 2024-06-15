@@ -12,7 +12,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
-migration_dir = os.path.join(app.root_path,migrate.directory)
+migration_dir = os.path.join(app.root_path,migrate.directory) # can be deprecated
 should_schedule = os.path.exists(migration_dir)
 
 from app import models,routes

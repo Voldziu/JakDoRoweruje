@@ -2,9 +2,10 @@ from geopy.distance import geodesic
 import requests
 
 import re
-
+from flask import jsonify
 from app.models import Stations
 from app import db, app
+from Constants import api_key
 
 
 def update_database():
@@ -27,7 +28,7 @@ def update_database():
                     if station_name in existing_stations:
                         station = existing_stations[station_name]
                         station.available_bikes = place.get('bikes', 0)
-                        #print("Updating")
+                        print("Updating")
 
                     else:
                         station = Stations(station_name=station_name, station_lat=place['lat'],
@@ -76,7 +77,7 @@ def find_n_nearest_stations(coords, n, end_station=False):
     latitude = coords[0]
     longitude = coords[1]
 
-    stations_list = []
+    stations_list = [] # test if list is empty
     for station in stations:
         distance = geodesic((latitude, longitude), (station.station_lat, station.station_len)).meters
         if (end_station and station.bikes_available > 0) or (end_station == False and "BIKE" not in station.station_name):
@@ -90,7 +91,7 @@ def find_n_nearest_stations(coords, n, end_station=False):
 def get_nearest_stations(start_point, end_point):
     start_coords = geocode(start_point)
     end_coords = geocode(end_point)
-    print(start_coords)
+    #print(start_coords)
 
     nearest_stations_start = find_n_nearest_stations(start_coords, 5)
     nearest_stations_finish = find_n_nearest_stations(end_coords, 5)
@@ -116,4 +117,26 @@ def get_nearest_stations(start_point, end_point):
     ]
 
     return {'start_stations': start_stations, 'end_stations': end_stations}
+
+
+
+def route_from_a_to_b(start_coords, end_coords, vehicle):
+
+    if vehicle in ["bike",'foot']:
+        api_key = "73aa3aa2-b205-461e-b88d-1727f0410895"
+        graphhopper_url = f"https://graphhopper.com/api/1/route?point={start_coords[0]},{start_coords[1]}&point={end_coords[0]},{end_coords[1]}&vehicle={vehicle}&locale=pl&key={api_key}&points_encoded=false"
+        response = requests.get(graphhopper_url)
+        data = response.json()
+
+    if response.status_code == 200 and 'paths' in data:
+        route = data['paths'][0]['points']['coordinates']
+        route_coords = [[lat, lon] for lon, lat in route]
+        return {
+            'route': route_coords,
+            'start_coords': [start_coords[0], start_coords[1]],
+            'end_coords': [end_coords[0], end_coords[1]]
+        }
+    else:
+        return {'error': 'Error fetching route data'}
+
 
