@@ -62,6 +62,28 @@ def geocode(address):
     else:
         return None
 
+def reverse_geocode(lat,lng):
+    url = 'https://nominatim.openstreetmap.org/reverse'
+    params = {
+        'lat': lat,  # Replace with your latitude
+        'lon': lng,  # Replace with your longitude
+        'format': 'json'
+    }
+
+    # Define headers (optional, but recommended)
+    headers = {
+        'User-Agent': 'YourAppName/1.0 (m.wojciechowski2413@gmail.com)'
+    }
+    response = requests.get(url, params=params, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    print(data.keys())
+
+    if data:
+        return data['display_name']
+    else:
+        return None
+
 
 # def process_addres(address):
 #     print(address)

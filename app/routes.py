@@ -3,7 +3,7 @@ from app import app
 from flask import render_template, request, jsonify
 from forms import DirectionsForm
 import requests
-from functionalities import get_nearest_stations,route_from_a_to_b
+from functionalities import get_nearest_stations,route_from_a_to_b,reverse_geocode
 from app.models import Stations
 
 
@@ -70,3 +70,13 @@ def suggestions():
     #print(suggestions)
 
     return jsonify(suggestions_raw =data)
+
+@app.route('/geocode',methods=["POST"])
+def geocode():
+    data= request.get_json()
+    lat = data['lat']
+    lng = data['lng']
+    display_name = reverse_geocode(lat,lng)
+    return jsonify(display_name=display_name)
+
+

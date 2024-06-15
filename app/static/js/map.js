@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
         position: 'bottomleft'
     }).addTo(map);
 
+    map.on('click',onMapClick)
+
     var startStationMarker, endStationMarker;
     var startLocationMarker, endLocationMarker;
     var stationMarkers = [];
@@ -91,14 +93,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     map.removeLayer(startLocationMarker);
                     startLocationMarker = null;
                 }
-                startLocationMarker = L.marker([lat, lon], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'})}).addTo(map);
+                startLocationMarker = L.marker([lat, lon], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'})}).addTo(map).on('click', function(e) {
+    map.removeLayer(startLocationMarker); // Remove the marker from the map
+    startLocationMarker=null;
+    });;
             } else {
                 if (endLocationMarker) {
-                    clearMarkers();
+
                     map.removeLayer(endLocationMarker);
                     endLocationMarker = null;
+                    clearMarkers();
                 }
-                endLocationMarker = L.marker([lat, lon], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/pink-dot.png'})}).addTo(map);
+                endLocationMarker = L.marker([lat, lon], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/pink-dot.png'})}).addTo(map).on('click', function(e) {
+
+                    map.removeLayer(endLocationMarker); // Remove the marker from the map
+                    endLocationMarker=null;
+                    clearMarkers();
+    });;
             }
             checkLocationMarkers();
 
@@ -135,9 +146,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     clearButton.addEventListener("click",clearMarkers);
 
+
     function handleSearch() {
     var startPoint = startAddressInput.value;
     var endPoint = endAddressInput.value;
+    console.log(startPoint);
+    console.log(endPoint);
 
     fetch('/nearest_stations', {
         method: 'POST',
@@ -308,6 +322,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Return the closest object with minimal distance
     return closestObject;
+}
+
+   function onMapClick(e) {
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+
+    if (!startLocationMarker) {
+        startLocationMarker = L.marker([lat, lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'})}).addTo(map)
+            .on('click', function () {
+                map.removeLayer(startLocationMarker);
+                startLocationMarker = null;
+                clearMarkers();
+                startAddressInput.value="";
+            });
+
+        fetch_geocode(lat, lng)
+            .then(display_name => {
+                startAddressInput.value = display_name;
+                checkLocationMarkers();  // Check location markers only after setting the input value
+            })
+            .catch(error => {
+                console.error('Error fetching geocode:', error);
+            });
+    } else if (!endLocationMarker) {
+        endLocationMarker = L.marker([lat, lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/pink-dot.png'})}).addTo(map)
+            .on('click', function () {
+                map.removeLayer(endLocationMarker);
+                endLocationMarker = null;
+                clearMarkers();
+                endAddressInput.value="";
+            });
+
+        fetch_geocode(lat, lng)
+            .then(display_name => {
+                endAddressInput.value = display_name;
+                checkLocationMarkers();  // Check location markers only after setting the input value
+            })
+            .catch(error => {
+                console.error('Error fetching geocode:', error);
+            });
+    }
+}
+
+
+    function fetch_geocode(lat, lng){
+    return fetch('/geocode', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            lat: lat,
+            lng: lng,
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        } else {
+            return data.display_name;
+        }
+    });
 }
 });
 
