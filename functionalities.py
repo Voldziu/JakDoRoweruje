@@ -5,7 +5,7 @@ import re
 from flask import jsonify
 from app.models import Stations
 from app import db, app
-from Constants import api_key
+from constants import api_key as key
 
 
 def update_database():
@@ -17,7 +17,6 @@ def update_database():
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
-        #print(f'updated_database: {data}')
         if 'countries' in data and data['countries']:
             wroclaw_data = data['countries'][0]['cities'][0]['places']
             with app.app_context():
@@ -43,6 +42,7 @@ def update_database():
 
                 db.session.commit()
 
+
 def geocode(address):
     url = 'https://nominatim.openstreetmap.org/search'
 
@@ -62,7 +62,8 @@ def geocode(address):
     else:
         return None
 
-def reverse_geocode(lat,lng):
+
+def reverse_geocode(lat, lng):
     url = 'https://nominatim.openstreetmap.org/reverse'
     params = {
         'lat': lat,  # Replace with your latitude
@@ -113,7 +114,6 @@ def find_n_nearest_stations(coords, n, end_station=False):
 def get_nearest_stations(start_point, end_point):
     start_coords = geocode(start_point)
     end_coords = geocode(end_point)
-    #print(start_coords)
 
     nearest_stations_start = find_n_nearest_stations(start_coords, 5)
     nearest_stations_finish = find_n_nearest_stations(end_coords, 5)
@@ -144,8 +144,8 @@ def get_nearest_stations(start_point, end_point):
 
 def route_from_a_to_b(start_coords, end_coords, vehicle):
 
-    if vehicle in ["bike",'foot']:
-        api_key = "73aa3aa2-b205-461e-b88d-1727f0410895"
+    if vehicle in ["bike", 'foot']:
+        api_key = key
         graphhopper_url = f"https://graphhopper.com/api/1/route?point={start_coords[0]},{start_coords[1]}&point={end_coords[0]},{end_coords[1]}&vehicle={vehicle}&locale=pl&key={api_key}&points_encoded=false"
         response = requests.get(graphhopper_url)
         data = response.json()

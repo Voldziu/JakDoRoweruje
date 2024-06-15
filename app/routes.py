@@ -1,9 +1,10 @@
-import Constants
+import constants
 from app import app
 from flask import render_template, request, jsonify
 from forms import DirectionsForm
 import requests
-from functionalities import get_nearest_stations,route_from_a_to_b,reverse_geocode
+from functionalities import get_nearest_stations, route_from_a_to_b, reverse_geocode
+from constants import CityName as cityname
 from app.models import Stations
 
 
@@ -11,6 +12,7 @@ from app.models import Stations
 def index():
     cord_form = DirectionsForm()
     return render_template('index.html', form=cord_form)
+
 
 @app.route('/nearest_stations', methods=['POST'])
 def nearest_stations():
@@ -34,17 +36,15 @@ def route():
     start_coords = data['start_coords']
     end_coords = data['end_coords']
 
-    from_start_to_start_station_dict= route_from_a_to_b(start_coords,start_coords_station,"foot")
-    from_start_station_to_end_station_dict = route_from_a_to_b(start_coords_station,end_coords_station,"bike")
+    from_start_to_start_station_dict = route_from_a_to_b(start_coords, start_coords_station, "foot")
+    from_start_station_to_end_station_dict = route_from_a_to_b(start_coords_station, end_coords_station, "bike")
     from_end_station_to_end_dict = route_from_a_to_b(end_coords_station, end_coords, "foot")
     return jsonify({
         "from_start_to_start_station_dict": from_start_to_start_station_dict,
-        "from_start_station_to_end_station_dict":from_start_station_to_end_station_dict,
+        "from_start_station_to_end_station_dict": from_start_station_to_end_station_dict,
         "from_end_station_to_end_dict": from_end_station_to_end_dict
 
     })
-
-
 
 
 @app.route('/suggestions', methods=["POST"])
@@ -54,7 +54,7 @@ def suggestions():
     if query:
         url = 'https://nominatim.openstreetmap.org/search'
         params = {
-            'q': query + "," + Constants.CityName,
+            'q': query + "," + cityname,
             'format': 'json',
             'addressdetails': 1,
             'limit': 5
@@ -66,17 +66,13 @@ def suggestions():
         response.raise_for_status()
         data = response.json()
 
+    return jsonify(suggestions_raw=data)
 
-    #print(suggestions)
 
-    return jsonify(suggestions_raw =data)
-
-@app.route('/geocode',methods=["POST"])
+@app.route('/geocode', methods=["POST"])
 def geocode():
-    data= request.get_json()
+    data = request.get_json()
     lat = data['lat']
     lng = data['lng']
-    display_name = reverse_geocode(lat,lng)
+    display_name = reverse_geocode(lat, lng)
     return jsonify(display_name=display_name)
-
-

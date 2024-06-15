@@ -15,7 +15,7 @@ migrate = Migrate(app, db)
 migration_dir = os.path.join(app.root_path,migrate.directory) # can be deprecated
 should_schedule = os.path.exists(migration_dir)
 
-from app import models,routes
+from app import models, routes
 
 from scheduler import start_scheduler
 

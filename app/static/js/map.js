@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var startAddressHints = document.getElementById('address-hints-start');
     var endAddressHints = document.getElementById('address-hints-end');
     // Function to fetch address hints from OpenStreetMap Nominatim API
-    function fetchAddressHints(input, container,start) {
+    function fetchAddressHints(input, container, start) {
        // console.log(50);
         var value = input.value;
 
