@@ -1,11 +1,10 @@
-import constants
 from app import app
 from flask import render_template, request, jsonify
 from forms import DirectionsForm
 import requests
 from functionalities import get_nearest_stations, route_from_a_to_b, reverse_geocode
 from constants import CityName as cityname
-from app.models import Stations
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -17,11 +16,8 @@ def index():
 @app.route('/nearest_stations', methods=['POST'])
 def nearest_stations():
     data = request.get_json()
-    print(data)
     start_point = data['start_point']
     end_point = data['end_point']
-    print(start_point)
-    print(end_point)
 
     nearest_stations = get_nearest_stations(start_point, end_point)
     print(nearest_stations)

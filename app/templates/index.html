@@ -7,32 +7,22 @@
         <div>
             <label for="start-address">{{ form.start_point.label }}</label><br>
             {{ form.start_point(size=32, class="address-input", id="start-address") }}
+            <button type="button" id="clear_start_button">x</button>
         </div>
-        <div class=address-hints-container >
-            <table id="address-hints-start" class="address-suggestions-table"></table> <!-- Empty table for start address suggestions -->
+        <div class="address-hints-container">
+            <table id="address-hints-start" class="address-suggestions-table"></table>
         </div>
         <div>
             <label for="end-address">{{ form.end_point.label }}</label><br>
             {{ form.end_point(size=32, class="address-input", id="end-address") }}
+            <button type="button" id="clear_end_button">x</button>
         </div>
-        <div class=address-hints-container>
-            <table id="address-hints-end" class="address-suggestions-table"></table> <!-- Empty table for end address suggestions -->
+        <div class="address-hints-container">
+            <table id="address-hints-end" class="address-suggestions-table"></table>
         </div>
-{#        <p>{{ form.submit() }}</p>#}
-
-{#        <p>#}
-{#            {{ form.start_point.label }}<br>#}
-{#            {{ form.start_point(size=32) }}#}
-{#        </p>#}
-{#        <p>#}
-{#            {{ form.end_point.label }}<br>#}
-{#            {{ form.end_point(size=32) }}#}
-{#        </p>#}
 
         <p><button type="button" id="search_button">Search Stations</button></p>
-{#        <p><button type="submit" id="find_route_button" style="display: none;">Find Route</button></p>#}
         <p><button type="button" id="clear_button">Clear</button></p>
-
     </form>
     <div id="map" style="height: 100vh;"></div>
     <script src="{{ url_for('static', filename='js/functionalities.js') }}"></script>
