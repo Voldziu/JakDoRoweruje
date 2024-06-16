@@ -140,66 +140,88 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function handleSearch() {
-        var startPoint = startAddressInput.value;
-        var endPoint = endAddressInput.value;
+    var startPoint = startAddressInput.value;
+    var endPoint = endAddressInput.value;
 
-        return fetch('/nearest_stations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                start_point: startPoint,
-                end_point: endPoint
-            })
+    return fetch('/nearest_stations', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            start_point: startPoint,
+            end_point: endPoint
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-            } else {
-                clearMarkers();
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            clearMarkers();
 
-                console.log(data)
-                data.start_stations.forEach(station => {
-                    var marker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'})}).addTo(map)
-                        .bindPopup(`Start Station: ${station.station_name}`)
-                        .on('click', function () {
-                            if (startStationMarker) {
-                                map.removeLayer(startStationMarker);
-                            }
-                            startStationMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'})}).addTo(map).bindPopup('Start').openPopup();
-                            checkMarkers();
-                        });
-                    stationMarkers.push(marker);
-                });
+            data.start_stations.forEach(station => {
+                var marker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'})})
+                    .addTo(map)
+                    .bindPopup(`Start Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
+                    .on('mouseover', function () {
+                        marker.openPopup();
+                    })
+                    .on('mouseout', function () {
+                    marker.closePopup();
+                    })
+                    .on('click', function () {
+                        if (startStationMarker) {
+                            map.removeLayer(startStationMarker);
+                        }
+                        startStationMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'})})
+                            .addTo(map);
+                        checkMarkers();
+                    });
+                stationMarkers.push(marker);
+            });
 
-                data.end_stations.forEach(station => {
-                    var marker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'})}).addTo(map)
-                        .bindPopup(`End Station: ${station.station_name}`)
-                        .on('click', function () {
-                            if (endStationMarker) {
-                                map.removeLayer(endStationMarker);
-                            }
-                            endStationMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'})}).addTo(map).bindPopup('End').openPopup();
-                            checkMarkers();
-                        });
-                    stationMarkers.push(marker);
-                });
+            data.end_stations.forEach(station => {
+                var marker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'})})
+                    .addTo(map)
+                    .bindPopup(`End Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
+                    .on('mouseover', function () {
+                        marker.openPopup();
+                    })
+                    .on('mouseout', function () {
+                    marker.closePopup();
+                    })
+                    .on('click', function () {
+                        if (endStationMarker) {
+                            map.removeLayer(endStationMarker);
+                        }
+                        endStationMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'})})
+                            .addTo(map);
+                        checkMarkers();
+                    });
+                stationMarkers.push(marker);
+            });
 
-                var start_closest_station = findMinDistance(data.start_stations);
-                var end_closest_station = findMinDistance(data.end_stations);
-                startStationMarker = L.marker([start_closest_station.station_lat, start_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'})}).addTo(map).bindPopup('Start').openPopup();
-                endStationMarker = L.marker([end_closest_station.station_lat, end_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'})}).addTo(map).bindPopup('End').openPopup();
+            var start_closest_station = findMinDistance(data.start_stations);
+            var end_closest_station = findMinDistance(data.end_stations);
+            startStationMarker = L.marker([start_closest_station.station_lat, start_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'})})
+                .addTo(map)
+                .bindPopup('Start')
+                .openPopup();
+            endStationMarker = L.marker([end_closest_station.station_lat, end_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'})})
+                .addTo(map)
+                .bindPopup('End')
+                .openPopup();
 
-                handleSubmit();
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-            alert('Error fetching data. Please try again.');
-        });
-    }
+            handleSubmit(); // Automatyczne wywołanie funkcji handleSubmit po wyszukaniu najbliższych stacji
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+        alert('Error fetching data. Please try again.');
+    });
+}
+
 
     function handleSubmit() {
         if (!startStationMarker || !endStationMarker) {

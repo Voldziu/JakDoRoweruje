@@ -7,3 +7,9 @@ docker run -d -p 5002:5000 flask:0.0.1
 
 
 DODAC ACTION LISTENERY DLA TYCH WSZYSTKICH MARKEROW, ZEBY BYLY ZAWSZE
+
+zmienic suggestions, tak zeby dalo sie wybrac miejsce bez sugestii bo wolno dzialaja
+zmienic zeby wyszukiwalo stacje tylko takie gdzie rowery sa dostepne (done)
+fajnie gdyby na boku wyswietlalo sie jak duzy dystans bedzie do przebycia i ile on w przyblizeniu zajmie minut
+Okroic mape do wroclawia
+upewnic sie ze suggestions podpowiada tylko miejsca z wroclawia

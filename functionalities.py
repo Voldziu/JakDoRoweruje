@@ -103,7 +103,7 @@ def find_n_nearest_stations(coords, n, end_station=False):
     stations_list = [] # test if list is empty
     for station in stations:
         distance = geodesic((latitude, longitude), (station.station_lat, station.station_len)).meters
-        if (end_station and station.bikes_available > 0) or (end_station == False and "BIKE" not in station.station_name):
+        if (not end_station and station.bikes_available > 0) or (end_station and "BIKE" not in station.station_name):
             stations_list.append(
                 (station.station_name, station.station_lat, station.station_len, station.bikes_available, distance))
 
