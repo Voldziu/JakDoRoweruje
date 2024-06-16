@@ -100,7 +100,7 @@ def find_n_nearest_stations(coords, n, end_station=False):
     latitude = coords[0]
     longitude = coords[1]
 
-    stations_list = [] # test if list is empty
+    stations_list = []
     for station in stations:
         distance = geodesic((latitude, longitude), (station.station_lat, station.station_len)).meters
         if (not end_station and station.bikes_available > 0) or (end_station and "BIKE" not in station.station_name):
@@ -116,7 +116,7 @@ def get_nearest_stations(start_point, end_point):
     end_coords = geocode(end_point)
 
     nearest_stations_start = find_n_nearest_stations(start_coords, 5)
-    nearest_stations_finish = find_n_nearest_stations(end_coords, 5)
+    nearest_stations_finish = find_n_nearest_stations(end_coords, 5, True)
 
     start_stations = [
         {
@@ -141,9 +141,7 @@ def get_nearest_stations(start_point, end_point):
     return {'start_stations': start_stations, 'end_stations': end_stations}
 
 
-
 def route_from_a_to_b(start_coords, end_coords, vehicle):
-
     if vehicle in ["bike", 'foot']:
         api_key = key
         graphhopper_url = f"https://graphhopper.com/api/1/route?point={start_coords[0]},{start_coords[1]}&point={end_coords[0]},{end_coords[1]}&vehicle={vehicle}&locale=pl&key={api_key}&points_encoded=false"
@@ -151,14 +149,24 @@ def route_from_a_to_b(start_coords, end_coords, vehicle):
         data = response.json()
 
     if response.status_code == 200 and 'paths' in data:
-        route = data['paths'][0]['points']['coordinates']
+        path = data['paths'][0]
+        route = path['points']['coordinates']
         route_coords = [[lat, lon] for lon, lat in route]
+        distance = path.get('distance', 0)
+        time = path.get('time', 0)
+
+        print(f"Route fetched successfully: {route_coords}")
+        print(f"Distance: {distance} meters, Time: {time} ms")
+
         return {
             'route': route_coords,
             'start_coords': [start_coords[0], start_coords[1]],
-            'end_coords': [end_coords[0], end_coords[1]]
+            'end_coords': [end_coords[0], end_coords[1]],
+            'distance': distance,
+            'time': time
         }
     else:
+        print(f"Error fetching route data: {response.status_code}, {data}")
         return {'error': 'Error fetching route data'}
 
 

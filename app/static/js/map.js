@@ -206,14 +206,11 @@ document.addEventListener('DOMContentLoaded', function () {
             var end_closest_station = findMinDistance(data.end_stations);
             startStationMarker = L.marker([start_closest_station.station_lat, start_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'})})
                 .addTo(map)
-                .bindPopup('Start')
-                .openPopup();
+
             endStationMarker = L.marker([end_closest_station.station_lat, end_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'})})
                 .addTo(map)
-                .bindPopup('End')
-                .openPopup();
 
-            handleSubmit(); // Automatyczne wywołanie funkcji handleSubmit po wyszukaniu najbliższych stacji
+            handleSubmit();
         }
     })
     .catch(error => {
@@ -257,9 +254,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 clearPath();
 
-                L.polyline(from_start_to_start_station_dict.route, {color: 'red'}).addTo(map);
-                L.polyline(from_start_station_to_end_station_dict.route, {color: 'blue'}).addTo(map);
-                L.polyline(from_end_station_to_end_dict.route, {color: 'red'}).addTo(map);
+                var polyline1 = L.polyline(from_start_to_start_station_dict.route, {color: 'red'}).addTo(map);
+                var polyline2 = L.polyline(from_start_station_to_end_station_dict.route, {color: 'blue'}).addTo(map);
+                var polyline3 = L.polyline(from_end_station_to_end_dict.route, {color: 'red'}).addTo(map);
+                addRoutePopup(polyline1, from_start_to_start_station_dict);
+                addRoutePopup(polyline2, from_start_station_to_end_station_dict);
+                addRoutePopup(polyline3, from_end_station_to_end_dict);
             }
         })
         .catch(error => {
@@ -267,6 +267,20 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Error fetching route. Please try again.');
         });
     }
+
+  function addRoutePopup(polyline, routeData) {
+    var totalTimeInSeconds = routeData.time / 1000;
+    var minutes = Math.floor(totalTimeInSeconds / 60);
+    var seconds = totalTimeInSeconds % 60;
+
+    var totalDistance = routeData.distance / 1000;
+
+    var popupContent = `Time: ${minutes} minutes ${seconds.toFixed(0)} seconds<br>Distance: ${totalDistance.toFixed(2)} km`;
+    polyline.bindPopup(popupContent, { autoClose: false }).openPopup();
+}
+
+
+
 
     function clearMarkers() {
         stationMarkers.forEach(marker => map.removeLayer(marker));
