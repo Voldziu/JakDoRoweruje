@@ -262,6 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addRoutePopup(polyline1, from_start_to_start_station_dict);
                 addRoutePopup(polyline2, from_start_station_to_end_station_dict);
                 addRoutePopup(polyline3, from_end_station_to_end_dict);
+                addRouteInfo(from_start_to_start_station_dict, from_start_station_to_end_station_dict, from_end_station_to_end_dict)
             }
         })
         .catch(error => {
@@ -280,6 +281,17 @@ document.addEventListener('DOMContentLoaded', function () {
     var popupContent = `Time: ${minutes} minutes ${seconds.toFixed(0)} seconds<br>Distance: ${totalDistance.toFixed(2)} km`;
     polyline.bindPopup(popupContent, { autoClose: false }).openPopup();
 }
+
+   function addRouteInfo(route_data_start, route_data_cycle, route_data_end) {
+        var totalTime = route_data_start.time + route_data_cycle.time + route_data_end.time;
+        totalTime = (totalTime / 1000);
+        totalTime = Math.floor(totalTime / 60);
+        var totalDistance = route_data_cycle.distance + route_data_end.distance + route_data_start.distance;
+        totalDistance = totalDistance / 1000
+        var popupContent = `Time: ${totalTime} minutes <br>Distance: ${totalDistance.toFixed(2)} km`;
+        var routeInfo = document.getElementById('route-info');
+        routeInfo.innerHTML = popupContent;
+   }
 
 
 

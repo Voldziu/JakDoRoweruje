@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -45,7 +46,6 @@
     outline: none;
 }
 
-/* Stylizacja przycisku "x" */
 .clear-button {
     background-color: #81b681;
     border: none;
@@ -94,6 +94,20 @@
     background-color: rgba(255, 255, 255, 0.8);
 }
 
+.route-info-container {
+    position: absolute;
+    top: 150px;
+    left: 270px;
+    border: 3px solid #81b681;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    width: 150px;
+    height: 60px;
+}
 
-
-
+.route-info {
+    font-size: 16px;
+    color: #333;
+}

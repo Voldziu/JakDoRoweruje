@@ -13,3 +13,7 @@ zmienic zeby wyszukiwalo stacje tylko takie gdzie rowery sa dostepne (done)
 fajnie gdyby na boku wyswietlalo sie jak duzy dystans bedzie do przebycia i ile on w przyblizeniu zajmie minut
 Okroic mape do wroclawia
 upewnic sie ze suggestions podpowiada tylko miejsca z wroclawia  # jest "{input} + ,Wrocław" w logice, to dostaje api
+mozna wrzucic wszystkie elementy gui tzn przyciski itp do forma ktory ladujemy zeby nie trzeba bylo robic tego czysto w html
+naprawic zeby klikniecie search przed uzupelnieniem sie tras w polach nie powodowalo bledu
+pinezki w ksztalcie rowerow
+dymki z odleglosciami przezroczyste
