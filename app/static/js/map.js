@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (startLocationMarker) {
             map.removeLayer(startLocationMarker);
             startLocationMarker = null;
+            clearMarkers();
         }
     });
 
@@ -136,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (endLocationMarker) {
             map.removeLayer(endLocationMarker);
             endLocationMarker = null;
+            clearMarkers();
         }
     });
 

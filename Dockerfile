@@ -7,5 +7,8 @@ COPY ./requirements.txt /app/
 RUN pip install -r requirements.txt
 
 COPY . .
+CMD ["flask","db","init"]
+CMD ["flask", "db", "migrate", "-m", "Stations table"]
+CMD ["flask","db","upgrade"]
 
-CMD ["python","app.py"]
+CMD ["python","run.py"]
