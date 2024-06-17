@@ -39,7 +39,6 @@ def route():
         "from_start_to_start_station_dict": from_start_to_start_station_dict,
         "from_start_station_to_end_station_dict": from_start_station_to_end_station_dict,
         "from_end_station_to_end_dict": from_end_station_to_end_dict
-
     })
 
 

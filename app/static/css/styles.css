@@ -22,3 +22,78 @@
     margin: 0 0 10px 0;
 }
 
+.input-with-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.address-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.address-input:focus {
+    border-color: #81b681;
+    box-shadow: 0 0 5px rgba(129, 182, 129, 0.5);
+    outline: none;
+}
+
+/* Stylizacja przycisku "x" */
+.clear-button {
+    background-color: #81b681;
+    border: none;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    margin-left: 5px;
+}
+
+.clear-button:hover {
+    background-color: #6fa96a;
+}
+
+.map-buttons .map-button {
+    background-color: #81b681;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition-duration: 0.4s;
+}
+
+.map-buttons .map-button:hover {
+    background-color: white;
+    color: black;
+    border: 2px solid #81b681;
+}
+
+.form-container {
+    padding: 20px;
+    border: 2px solid #81b681;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+
+
+

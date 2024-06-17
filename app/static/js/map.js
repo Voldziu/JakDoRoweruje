@@ -283,7 +283,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
     function clearMarkers() {
         stationMarkers.forEach(marker => map.removeLayer(marker));
         if (startStationMarker) {
