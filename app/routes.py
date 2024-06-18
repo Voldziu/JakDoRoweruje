@@ -93,15 +93,6 @@ def find_closest_station():
     return jsonify(best_station = MinStation)
 
 
-@app.route('/get_map_bounds')
-def get_map_bounds():
-    far_southwest, far_northeast = find_boundary_stations()
-    print(far_northeast.station_lat)
-    print(far_northeast.station_len)
-    return jsonify({
-        'southwest': [far_southwest.station_lat,far_southwest.station_len],
-        'northeast': [far_northeast.station_lat,far_northeast.station_len]
-    })
 
 
 
