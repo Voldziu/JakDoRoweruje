@@ -31,6 +31,7 @@ def route():
     end_coords_station = data['end_coords_station']
     start_coords = data['start_coords']
     end_coords = data['end_coords']
+    print(start_coords)
 
     from_start_to_start_station_dict = route_from_a_to_b(start_coords, start_coords_station, "foot")
     from_start_station_to_end_station_dict = route_from_a_to_b(start_coords_station, end_coords_station, "bike")
@@ -71,3 +72,24 @@ def geocode():
     lng = data['lng']
     display_name = reverse_geocode(lat, lng)
     return jsonify(display_name=display_name)
+
+@app.route('/best_station' , methods=["POST"])
+def find_closest_station():
+    data = request.get_json()
+    print(data)
+    list_of_stations = data['list_of_stations']
+    location_lat = data['lat']
+    location_lon = data['lon']
+    MinTime = 100000000
+    MinStation=None
+    for station in list_of_stations:
+        print(station)
+        dict = route_from_a_to_b([location_lat,location_lon],[station['station_lat'],station['station_lng']],'foot')
+        print(dict)
+        time = dict['time']
+        if(time<MinTime):
+            MinTime=time
+            MinStation=station
+    return jsonify(best_station = MinStation)
+
+

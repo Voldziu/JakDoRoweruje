@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var clearButton = document.getElementById('clear_button');
     var clearStartButton = document.getElementById('clear_start_button');
     var clearEndButton = document.getElementById('clear_end_button');
+    var routeInfo = document.getElementById('route-info');
 
     var startAddressHints = document.getElementById('address-hints-start');
     var endAddressHints = document.getElementById('address-hints-end');
@@ -73,11 +74,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (start) {
                     if (startLocationMarker) {
-                        clearMarkers();
+                        clearPathAndStationMarkers();
+                        clearRouteInfo();
                         map.removeLayer(startLocationMarker);
                         startLocationMarker = null;
                     }
-                    startLocationMarker = L.marker([lat, lon], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'})}).addTo(map).on('click', function(e) {
+                    startLocationMarker = L.marker([lat, lon], {icon: defaultStartLocationIcon}).addTo(map).on('click', function(e) {
                         map.removeLayer(startLocationMarker);
                         startLocationMarker = null;
                     });
@@ -85,12 +87,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (endLocationMarker) {
                         map.removeLayer(endLocationMarker);
                         endLocationMarker = null;
-                        clearMarkers();
+                        clearPathAndStationMarkers();
+                        clearRouteInfo();
                     }
-                    endLocationMarker = L.marker([lat, lon], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/pink-dot.png'})}).addTo(map).on('click', function(e) {
+                    endLocationMarker = L.marker([lat, lon], {icon: defaultEndLocationIcon}).addTo(map).on('click', function(e) {
                         map.removeLayer(endLocationMarker);
                         endLocationMarker = null;
-                        clearMarkers();
+                        clearPathAndStationMarkers();
+                        clearRouteInfo();
                     });
                 }
             });
@@ -103,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function hideSuggestions(container) {
         container.style.display = 'none';
+        container.innerHTML = '';
     }
 
     startAddressInput.addEventListener('input', function () {
@@ -113,31 +118,52 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchAddressHints(endAddressInput, endAddressHints, false);
     });
 
-    clearButton.addEventListener("click", clearMarkers);
+    clearButton.addEventListener("click", function() {
+        clearPathAndStationMarkers();
+        clearRouteInfo();
+        clearLocationMarkers();
+        startAddressInput.value="";
+        endAddressInput.value="";
+        hideSuggestions(startAddressHints);
+        hideSuggestions(endAddressHints);
+
+
+    });
 
     searchButton.addEventListener('click', function() {
-        handleSearch().then(() => {
-            if (startStationMarker && endStationMarker) {
-                handleSubmit();
-            }
-        });
+        // handleSearch().then(() => {
+        //     if (startStationMarker && endStationMarker) {
+        //         handleSubmit();
+        //     }
+        // });
+        handleSearch();
+        if (startStationMarker && endStationMarker) {
+                 handleSubmit();
+             }
     });
 
     clearStartButton.addEventListener("click", function() {
         startAddressInput.value = "";
+        hideSuggestions(startAddressHints);
         if (startLocationMarker) {
             map.removeLayer(startLocationMarker);
             startLocationMarker = null;
-            clearMarkers();
+            clearPathAndStationMarkers();
+            clearRouteInfo();
+
+
         }
     });
 
     clearEndButton.addEventListener("click", function() {
         endAddressInput.value = "";
+        hideSuggestions(endAddressHints);
         if (endLocationMarker) {
             map.removeLayer(endLocationMarker);
             endLocationMarker = null;
-            clearMarkers();
+            clearPathAndStationMarkers();
+            clearRouteInfo();
+
         }
     });
 
@@ -145,6 +171,133 @@ document.addEventListener('DOMContentLoaded', function () {
     var startPoint = startAddressInput.value;
     var endPoint = endAddressInput.value;
 
+    if (startPoint === "" || endPoint === "") {
+        alert("Please provide addresses.");
+        console.log("Please provide addresses.");
+        return;
+    }
+
+    fetchNearestStations(startPoint, endPoint)
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                throw new Error(data.error); // Propagate the error to the next catch block
+            }
+
+            // Clear existing markers and route info
+            clearPathAndStationMarkers();
+            clearRouteInfo();
+
+            // Process start stations
+            data.start_stations.forEach(station => {
+                var marker = L.marker([station.station_lat, station.station_lng], {icon: defaultStartStationIcon})
+                    .addTo(map)
+                    .bindPopup(`Start Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
+                    .on('mouseover', function () {
+                        marker.openPopup();
+                    })
+                    .on('mouseout', function () {
+                        marker.closePopup();
+                    })
+                    .on('click', function () {
+                        if (startStationMarker) {
+                            map.removeLayer(startStationMarker);
+                        }
+                        startStationMarker = L.marker([station.station_lat, station.station_lng], {icon: chosenStartStationIcon})
+                            .addTo(map)
+                            .bindPopup(`Start Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
+                            .on('mouseover', function () {
+                                marker.openPopup();
+                            })
+                            .on('mouseout', function () {
+                                marker.closePopup();
+                            });
+                        checkMarkers();
+                    });
+                stationMarkers.push(marker);
+            });
+
+            // Process end stations
+            data.end_stations.forEach(station => {
+                var marker = L.marker([station.station_lat, station.station_lng], {icon: defaultEndStationIcon})
+                    .addTo(map)
+                    .bindPopup(`End Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
+                    .on('mouseover', function () {
+                        marker.openPopup();
+                    })
+                    .on('mouseout', function () {
+                        marker.closePopup();
+                    })
+                    .on('click', function () {
+                        if (endStationMarker) {
+                            map.removeLayer(endStationMarker);
+                        }
+                        endStationMarker = L.marker([station.station_lat, station.station_lng], {icon: chosenEndStationIcon})
+                            .addTo(map)
+                            .bindPopup(`End Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
+                            .on('mouseover', function () {
+                                marker.openPopup();
+                            })
+                            .on('mouseout', function () {
+                                marker.closePopup();
+                            });
+                        checkMarkers();
+                    });
+                stationMarkers.push(marker);
+            });
+
+            // Fetch closest start station
+            findMinDistance(data.start_stations, [startLocationMarker.getLatLng().lat, startLocationMarker.getLatLng().lng])
+                .then(start_closest_station => {
+                    console.log('Closest start station:', start_closest_station);
+                    startStationMarker = L.marker([start_closest_station.station_lat, start_closest_station.station_lng], {icon: chosenStartStationIcon})
+                        .addTo(map)
+                        .bindPopup(`Start Station: ${start_closest_station.station_name}<br>Bikes Available: ${start_closest_station.bikes_available}`)
+                        .on('mouseover', function () {
+                            startStationMarker.openPopup();
+                        })
+                        .on('mouseout', function () {
+                            startStationMarker.closePopup();
+                        });
+
+                    // Call handleSubmit after fetching both start and end stations
+                    checkMarkers();
+                })
+                .catch(error => {
+                    console.error('Error fetching closest start station:', error);
+                    throw error; // Re-throw the error to propagate it to the next catch block
+                });
+
+            // Fetch closest end station
+            findMinDistance(data.end_stations, [endLocationMarker.getLatLng().lat, endLocationMarker.getLatLng().lng])
+                .then(end_closest_station => {
+                    console.log('Closest end station:', end_closest_station);
+                    endStationMarker = L.marker([end_closest_station.station_lat, end_closest_station.station_lng], {icon: chosenEndStationIcon})
+                        .addTo(map)
+                        .bindPopup(`End Station: ${end_closest_station.station_name}<br>Bikes Available: ${end_closest_station.bikes_available}`)
+                        .on('mouseover', function () {
+                            endStationMarker.openPopup();
+                        })
+                        .on('mouseout', function () {
+                            endStationMarker.closePopup();
+                        });
+
+                    // Call handleSubmit after fetching both start and end stations
+                    checkMarkers();
+                })
+                .catch(error => {
+                    console.error('Error fetching closest end station:', error);
+                    throw error; // Re-throw the error to propagate it to the next catch block
+                });
+        })
+        .catch(error => {
+            console.error('Error fetching data or handling form submission:', error);
+            alert('Error fetching data or handling form submission. Please try again.');
+        });
+
+}
+
+function fetchNearestStations(startPoint, endPoint) {
     return fetch('/nearest_stations', {
         method: 'POST',
         headers: {
@@ -155,71 +308,20 @@ document.addEventListener('DOMContentLoaded', function () {
             end_point: endPoint
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert(data.error);
-        } else {
-            clearMarkers();
-
-            data.start_stations.forEach(station => {
-                var marker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'})})
-                    .addTo(map)
-                    .bindPopup(`Start Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
-                    .on('mouseover', function () {
-                        marker.openPopup();
-                    })
-                    .on('mouseout', function () {
-                    marker.closePopup();
-                    })
-                    .on('click', function () {
-                        if (startStationMarker) {
-                            map.removeLayer(startStationMarker);
-                        }
-                        startStationMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'})})
-                            .addTo(map);
-                        checkMarkers();
-                    });
-                stationMarkers.push(marker);
-            });
-
-            data.end_stations.forEach(station => {
-                var marker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'})})
-                    .addTo(map)
-                    .bindPopup(`End Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
-                    .on('mouseover', function () {
-                        marker.openPopup();
-                    })
-                    .on('mouseout', function () {
-                    marker.closePopup();
-                    })
-                    .on('click', function () {
-                        if (endStationMarker) {
-                            map.removeLayer(endStationMarker);
-                        }
-                        endStationMarker = L.marker([station.station_lat, station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'})})
-                            .addTo(map);
-                        checkMarkers();
-                    });
-                stationMarkers.push(marker);
-            });
-
-            var start_closest_station = findMinDistance(data.start_stations);
-            var end_closest_station = findMinDistance(data.end_stations);
-            startStationMarker = L.marker([start_closest_station.station_lat, start_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'})})
-                .addTo(map)
-
-            endStationMarker = L.marker([end_closest_station.station_lat, end_closest_station.station_lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'})})
-                .addTo(map)
-
-            handleSubmit();
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+        return response.json();
     })
     .catch(error => {
-        console.error('Error fetching data:', error);
-        alert('Error fetching data. Please try again.');
+        console.error('Error fetching nearest stations:', error);
+        throw error; // Re-throw the error to propagate it to the next catch block
     });
 }
+
+
+
 
 
     function handleSubmit() {
@@ -289,13 +391,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var totalDistance = route_data_cycle.distance + route_data_end.distance + route_data_start.distance;
         totalDistance = totalDistance / 1000
         var popupContent = `Time: ${totalTime} minutes <br>Distance: ${totalDistance.toFixed(2)} km`;
-        var routeInfo = document.getElementById('route-info');
+
         routeInfo.innerHTML = popupContent;
    }
 
 
 
-    function clearMarkers() {
+    function clearPathAndStationMarkers() {
         stationMarkers.forEach(marker => map.removeLayer(marker));
         if (startStationMarker) {
             map.removeLayer(startStationMarker);
@@ -309,12 +411,28 @@ document.addEventListener('DOMContentLoaded', function () {
         clearPath();
         stationMarkers = [];
     }
+    function clearLocationMarkers() {
+        if (startLocationMarker) {
+            map.removeLayer(startLocationMarker);
+            startLocationMarker = null;
+        }
+        if (endLocationMarker) {
+            map.removeLayer(endLocationMarker);
+            endLocationMarker = null;
+        }
+    }
+
+    function clearRouteInfo() {
+        routeInfo.innerHTML="";
+    }
+
 
     function checkMarkers() {
         if (startStationMarker && endStationMarker) {
             handleSubmit();
         }
     }
+
 
     function clearPath() {
         map.eachLayer(function (layer) {
@@ -324,23 +442,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function findMinDistance(jsonList) {
-        console.log(jsonList)
-        if (jsonList.length === 0) {
-            return null;
-        }
-
-        var minDistance = Infinity;
-        var closestObject = null;
-
-        jsonList.forEach(obj => {
-            if (obj.distance < minDistance) {
-                minDistance = obj.distance;
-                closestObject = obj;
-            }
+    function findMinDistance(jsonList,point) {
+        return fetch_best_station(jsonList, point)
+        .then(closestObject => {
+            console.log(closestObject); // Log the closestObject JSON data
+            return closestObject; // Return the JSON object directly
+        })
+        .catch(error => {
+            console.error('Error fetching closest station:', error);
+            // Handle error appropriately if needed
+            return null; // or throw error
         });
-
-        return closestObject;
     }
 
     function onMapClick(e) {
@@ -348,11 +460,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const lng = e.latlng.lng;
 
         if (!startLocationMarker) {
-            startLocationMarker = L.marker([lat, lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'})}).addTo(map)
+
+            startLocationMarker = L.marker([lat, lng], {icon: defaultStartLocationIcon}).addTo(map)
                 .on('click', function () {
                     map.removeLayer(startLocationMarker);
                     startLocationMarker = null;
-                    clearMarkers();
+                    clearPathAndStationMarkers();
+                    clearRouteInfo();
                     startAddressInput.value = "";
                 });
 
@@ -364,11 +478,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error('Error fetching geocode:', error);
                 });
         } else if (!endLocationMarker) {
-            endLocationMarker = L.marker([lat, lng], {icon: L.icon({iconUrl: 'http://maps.google.com/mapfiles/ms/icons/pink-dot.png'})}).addTo(map)
+
+            endLocationMarker = L.marker([lat, lng], {icon: defaultEndLocationIcon}).addTo(map)
                 .on('click', function () {
                     map.removeLayer(endLocationMarker);
                     endLocationMarker = null;
-                    clearMarkers();
+                    clearPathAndStationMarkers();
+                    clearRouteInfo();
                     endAddressInput.value = "";
                 });
 
@@ -380,6 +496,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error('Error fetching geocode:', error);
                 });
         }
+    }
+    function fetch_best_station(list_of_stations,point){
+        return fetch('/best_station', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                list_of_stations: list_of_stations,
+                lat: point[0],
+                lon: point[1]
+            })
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            } else {
+                return data.best_station;
+            }
+        });
     }
 
     function fetch_geocode(lat, lng){

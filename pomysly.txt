@@ -6,14 +6,18 @@ docker run -d -p 5002:5000 flask:0.0.1
 
 
 
-DODAC ACTION LISTENERY DLA TYCH WSZYSTKICH MARKEROW, ZEBY BYLY ZAWSZE
+DODAC ACTION LISTENERY DLA TYCH WSZYSTKICH MARKEROW, ZEBY BYLY ZAWSZE # jebac to #
 
-zmienic suggestions, tak zeby dalo sie wybrac miejsce bez sugestii bo wolno dzialaja
+zmienic suggestions, tak zeby dalo sie wybrac miejsce bez sugestii bo wolno dzialaja # chuja wolno dzialaja, slaby internet masz #
 zmienic zeby wyszukiwalo stacje tylko takie gdzie rowery sa dostepne (done)
 fajnie gdyby na boku wyswietlalo sie jak duzy dystans bedzie do przebycia i ile on w przyblizeniu zajmie minut
 Okroic mape do wroclawia
 upewnic sie ze suggestions podpowiada tylko miejsca z wroclawia  # jest "{input} + ,Wrocław" w logice, to dostaje api
+
 mozna wrzucic wszystkie elementy gui tzn przyciski itp do forma ktory ladujemy zeby nie trzeba bylo robic tego czysto w html
-naprawic zeby klikniecie search przed uzupelnieniem sie tras w polach nie powodowalo bledu
-pinezki w ksztalcie rowerow
+
+naprawic zeby klikniecie search przed uzupelnieniem sie tras w polach nie powodowalo bledu  *CHECK*
+
+pinezki w ksztalcie rowerow *CHECK*
+
 dymki z odleglosciami przezroczyste
