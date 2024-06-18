@@ -26,3 +26,4 @@ dymki z odleglosciami przezroczyste
 
 biale zwinac (forma)
 napisy start point i end point troche oddalic
+przy suggestions rozwija sie biale
