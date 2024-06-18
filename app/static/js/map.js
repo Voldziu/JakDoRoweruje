@@ -8,6 +8,24 @@ document.addEventListener('DOMContentLoaded', function () {
     L.control.zoom({
         position: 'bottomleft'
     }).addTo(map);
+    // fetch('/get_map_bounds')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.southwest && data.northeast) {
+    //                 var southWest = L.latLng(data.southwest[0], data.southwest[1]);
+    //                 var northEast = L.latLng(data.northeast[0], data.northeast[1]);
+    //                 var bounds = L.latLngBounds(southWest, northEast);
+    //                 map.setMaxBounds(bounds);
+    //             }
+    //         })
+    //         .catch(error => console.error('Error fetching map boundaries:', error));
+        var southWest = L.latLng(southWestCoords[0],southWestCoords[1]); // Approx. southwest corner
+        var northEast = L.latLng(northEastCoords[0],northEastCoords[1]); // Approx. northeast corner
+        var bounds = L.latLngBounds(southWest, northEast);
+
+            // Set the map boundaries
+        map.setMaxBounds(bounds);
+
 
     map.on('click', onMapClick);
 
@@ -381,7 +399,12 @@ function fetchNearestStations(startPoint, endPoint) {
     var totalDistance = routeData.distance / 1000;
 
     var popupContent = `Time: ${minutes} minutes ${seconds.toFixed(0)} seconds<br>Distance: ${totalDistance.toFixed(2)} km`;
-    polyline.bindPopup(popupContent, { autoClose: false }).openPopup();
+    polyline.bindPopup(popupContent, { autoClose: false }).on('mouseover', function () {
+                            polyline.openPopup();
+                        })
+                        .on('mouseout', function () {
+                            polyline.closePopup();
+                        });
 }
 
    function addRouteInfo(route_data_start, route_data_cycle, route_data_end) {
