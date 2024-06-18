@@ -1,2 +1,2 @@
 CityName = "Wrocław"
-api_key = "73aa3aa2-b205-461e-b88d-1727f0410895"
+api_key = "a3d2bd38-44c3-4aae-b16d-5560d07ccc45"

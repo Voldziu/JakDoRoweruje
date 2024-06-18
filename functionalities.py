@@ -1,6 +1,6 @@
 from geopy.distance import geodesic
 import requests
-
+from datetime import datetime
 import re
 from flask import jsonify
 from app.models import Stations
@@ -41,45 +41,6 @@ def update_database():
                         db.session.delete(existing_stations[name])
 
                 db.session.commit()
-
-
-def find_boundary_stations():
-    with app.app_context():
-        stations = Stations.query.all()
-
-        if not stations:
-            print("No stations found in the database.")
-            return None, None
-
-        # Initialize far southwest and far northeast variables
-        far_southwest_station = None
-        far_northeast_station = None
-        far_southwest_coords = (float('inf'), float('inf'))  # (min_lat, min_lon)
-        far_northeast_coords = (float('-inf'), float('-inf'))  # (max_lat, max_lon)
-
-        for station in stations:
-            station_lat = station.station_lat
-            station_lng = station.station_len
-
-            # Update far southwest station
-            if (station_lat, station_lng) < far_southwest_coords:
-                far_southwest_coords = (station_lat, station_lng)
-                far_southwest_station = station
-
-            # Update far northeast station
-            if (station_lat, station_lng) > far_northeast_coords:
-                far_northeast_coords = (station_lat, station_lng)
-                far_northeast_station = station
-
-        # Print far southwest and far northeast stations
-        if far_southwest_station:
-            print("Far Southwest Station:", far_southwest_station.station_name, far_southwest_coords)
-        if far_northeast_station:
-            print("Far Northeast Station:", far_northeast_station.station_name, far_northeast_coords)
-
-        return far_southwest_station, far_northeast_station
-
-
 def geocode(address):
     url = 'https://nominatim.openstreetmap.org/search'
 
@@ -123,18 +84,9 @@ def reverse_geocode(lat, lng):
         return None
 
 
-# def process_addres(address):
-#     print(address)
-#     if re.search(r', Wrocław$', address):
-#         print("String ends with ', Wrocław'")
-#     else:
-#         print("String does not end with ', Wrocław'")
-#
-#     return address
 
 def find_n_nearest_stations(coords, n, end_station=False):
     stations = Stations.query.all()
-    print(find_boundary_stations())
     latitude = coords[0]
     longitude = coords[1]
 
@@ -145,8 +97,11 @@ def find_n_nearest_stations(coords, n, end_station=False):
             stations_list.append(
                 (station.station_name, station.station_lat, station.station_len, station.bikes_available, distance))
 
-    sorted_stations = sorted(stations_list, key=lambda x: x[4])
-    return sorted_stations[:n]
+    if stations_list:
+        sorted_stations = sorted(stations_list, key=lambda x: x[4])
+        return sorted_stations[:n]
+    else:
+        return []
 
 
 def get_nearest_stations(start_point, end_point):
@@ -155,7 +110,6 @@ def get_nearest_stations(start_point, end_point):
 
     nearest_stations_start = find_n_nearest_stations(start_coords, 5)
     nearest_stations_finish = find_n_nearest_stations(end_coords, 5, True)
-
     start_stations = [
         {
             'station_name': station[0],

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+
     var map = L.map('map', { zoomControl: false }).setView(WroclawCoordinates, 14);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var clearStartButton = document.getElementById('clear_start_button');
     var clearEndButton = document.getElementById('clear_end_button');
     var routeInfo = document.getElementById('route-info');
-
+    var lastUpdateInput = document.getElementById('last-update');
     var startAddressHints = document.getElementById('address-hints-start');
     var endAddressHints = document.getElementById('address-hints-end');
 
@@ -97,10 +98,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         map.removeLayer(startLocationMarker);
                         startLocationMarker = null;
                     }
-                    startLocationMarker = L.marker([lat, lon], {icon: defaultStartLocationIcon}).addTo(map).on('click', function(e) {
+                    if(check_if_fits_map(lat,lon)){
+                        startLocationMarker = L.marker([lat, lon], {icon: defaultStartLocationIcon}).addTo(map).on('click', function(e) {
                         map.removeLayer(startLocationMarker);
                         startLocationMarker = null;
                     });
+                    }
+
                 } else {
                     if (endLocationMarker) {
                         map.removeLayer(endLocationMarker);
@@ -108,12 +112,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         clearPathAndStationMarkers();
                         clearRouteInfo();
                     }
-                    endLocationMarker = L.marker([lat, lon], {icon: defaultEndLocationIcon}).addTo(map).on('click', function(e) {
+                    if(check_if_fits_map(lat,lon)) {
+                        endLocationMarker = L.marker([lat, lon], {icon: defaultEndLocationIcon}).addTo(map).on('click', function(e) {
                         map.removeLayer(endLocationMarker);
                         endLocationMarker = null;
-                        clearPathAndStationMarkers();
-                        clearRouteInfo();
+
                     });
+                    }
+
                 }
             });
 
@@ -149,11 +155,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     searchButton.addEventListener('click', function() {
-        // handleSearch().then(() => {
-        //     if (startStationMarker && endStationMarker) {
-        //         handleSubmit();
-        //     }
-        // });
         handleSearch();
         if (startStationMarker && endStationMarker) {
                  handleSubmit();
@@ -199,16 +200,20 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.error) {
                 alert(data.error);
-                throw new Error(data.error); // Propagate the error to the next catch block
+                throw new Error(data.error);
             }
 
-            // Clear existing markers and route info
+
             clearPathAndStationMarkers();
             clearRouteInfo();
 
-            // Process start stations
+
             data.start_stations.forEach(station => {
-                var marker = L.marker([station.station_lat, station.station_lng], {icon: defaultStartStationIcon})
+                lat = station.station_lat;
+                lon = station.station_lng;
+
+                if(check_if_fits_map(lat,lon)){
+                    var marker = L.marker([station.station_lat, station.station_lng], {icon: defaultStartStationIcon})
                     .addTo(map)
                     .bindPopup(`Start Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
                     .on('mouseover', function () {
@@ -233,11 +238,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         checkMarkers();
                     });
                 stationMarkers.push(marker);
-            });
+            }
+                });
 
-            // Process end stations
+
+
             data.end_stations.forEach(station => {
-                var marker = L.marker([station.station_lat, station.station_lng], {icon: defaultEndStationIcon})
+                lat = station.station_lat;
+                lon = station.station_lng;
+                if(check_if_fits_map(lat,lon)){
+                    var marker = L.marker([station.station_lat, station.station_lng], {icon: defaultEndStationIcon})
                     .addTo(map)
                     .bindPopup(`End Station: ${station.station_name}<br>Bikes Available: ${station.bikes_available}`)
                     .on('mouseover', function () {
@@ -262,6 +272,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         checkMarkers();
                     });
                 stationMarkers.push(marker);
+                }
+
             });
 
             // Fetch closest start station
@@ -278,12 +290,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             startStationMarker.closePopup();
                         });
 
-                    // Call handleSubmit after fetching both start and end stations
+
                     checkMarkers();
                 })
                 .catch(error => {
                     console.error('Error fetching closest start station:', error);
-                    throw error; // Re-throw the error to propagate it to the next catch block
+                    throw error;
                 });
 
             // Fetch closest end station
@@ -300,12 +312,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             endStationMarker.closePopup();
                         });
 
-                    // Call handleSubmit after fetching both start and end stations
                     checkMarkers();
                 })
                 .catch(error => {
                     console.error('Error fetching closest end station:', error);
-                    throw error; // Re-throw the error to propagate it to the next catch block
+                    throw error;
                 });
         })
         .catch(error => {
@@ -482,7 +493,7 @@ function fetchNearestStations(startPoint, endPoint) {
         const lat = e.latlng.lat;
         const lng = e.latlng.lng;
 
-        if (!startLocationMarker) {
+        if (!startLocationMarker && check_if_fits_map(lat,lng)) {
 
             startLocationMarker = L.marker([lat, lng], {icon: defaultStartLocationIcon}).addTo(map)
                 .on('click', function () {
@@ -500,7 +511,7 @@ function fetchNearestStations(startPoint, endPoint) {
                 .catch(error => {
                     console.error('Error fetching geocode:', error);
                 });
-        } else if (!endLocationMarker) {
+        } else if (!endLocationMarker && check_if_fits_map(lat,lng)) {
 
             endLocationMarker = L.marker([lat, lng], {icon: defaultEndLocationIcon}).addTo(map)
                 .on('click', function () {
@@ -571,4 +582,21 @@ function fetchNearestStations(startPoint, endPoint) {
             }
         });
     }
+
+    function check_if_fits_map(lat,lon) {
+        minlat = WroclawCityBounds[0]
+        maxlat = WroclawCityBounds[1]
+        minlon = WroclawCityBounds[2]
+        maxlon = WroclawCityBounds[3]
+        console.log(minlat,maxlat,minlon,maxlon)
+        if (minlat <= lat && lat <= maxlat && minlon <= lon && lon <= maxlon){
+            console.log(lat,lon);
+            return true;
+        } else{
+            alert("That point doesn't fit the bounds.")
+            return false;
+        }
+
+    }
+
 });

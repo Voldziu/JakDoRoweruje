@@ -1,6 +1,7 @@
 const WroclawCoordinates = [51.1097, 17.0316];
 const southWestCoords = [51.05-0.18,16.85-0.28];
 const northEastCoords = [51.17+0.18,17.20+0.28];
+const WroclawCityBounds= [51.03,51.17,16.85,17.20];
 const CityName = "Wrocław";
 
 const defaultStartStationIconUrl='https://img.icons8.com/ios/50/65A135/bicycle.png';

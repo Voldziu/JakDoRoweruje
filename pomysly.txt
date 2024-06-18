@@ -21,3 +21,8 @@ naprawic zeby klikniecie search przed uzupelnieniem sie tras w polach nie powodo
 pinezki w ksztalcie rowerow *CHECK*
 
 dymki z odleglosciami przezroczyste
+
+
+
+biale zwinac (forma)
+napisy start point i end point troche oddalic
