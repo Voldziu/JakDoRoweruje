@@ -119,6 +119,13 @@
     font-size: 16px;
     color: #333;
 }
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
 .buttons-and-info-container {
     display: flex;
     align-items: center;

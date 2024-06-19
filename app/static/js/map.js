@@ -141,13 +141,15 @@ document.addEventListener('DOMContentLoaded', function () {
         hideSuggestions(endAddressHints);
 
 
+
     });
 
     searchButton.addEventListener('click', function() {
         handleSearch();
         if (startStationMarker && endStationMarker) {
-                 handleSubmit();
+                 handleSubmit()
              }
+
     });
 
     clearStartButton.addEventListener("click", function() {
@@ -381,6 +383,7 @@ function fetchNearestStations(startPoint, endPoint) {
                 addRoutePopup(polyline2, from_start_station_to_end_station_dict);
                 addRoutePopup(polyline3, from_end_station_to_end_dict);
                 addRouteInfo(from_start_to_start_station_dict, from_start_station_to_end_station_dict, from_end_station_to_end_dict)
+                showRouteInfo()
             }
         })
         .catch(error => {
@@ -445,6 +448,7 @@ function fetchNearestStations(startPoint, endPoint) {
 
     function clearRouteInfo() {
         routeInfo.innerHTML="";
+        hideRouteInfo();
     }
 
 
@@ -584,6 +588,16 @@ function fetchNearestStations(startPoint, endPoint) {
             return false;
         }
 
+    }
+    function showRouteInfo() {
+        document.getElementById("route-info-container").classList.remove("hidden");
+        document.getElementById("route-info-container").classList.add("visible");
+    }
+
+    // Function to hide the route info container
+    function hideRouteInfo() {
+        document.getElementById("route-info-container").classList.remove("visible");
+        document.getElementById("route-info-container").classList.add("hidden");
     }
 
 });
