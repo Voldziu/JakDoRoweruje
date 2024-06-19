@@ -122,8 +122,8 @@
 .buttons-and-info-container {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Adjust as needed */
-    margin-bottom: 20px; /* Adjust margin as needed */
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 

@@ -1,8 +1,5 @@
 from geopy.distance import geodesic
 import requests
-from datetime import datetime
-import re
-from flask import jsonify
 from app.models import Stations
 from app import db, app
 from constants import api_key as key
@@ -41,6 +38,8 @@ def update_database():
                         db.session.delete(existing_stations[name])
 
                 db.session.commit()
+
+
 def geocode(address):
     url = 'https://nominatim.openstreetmap.org/search'
 

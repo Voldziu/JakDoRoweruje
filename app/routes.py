@@ -1,10 +1,11 @@
+import math
+
 from app import app
 from flask import render_template, request, jsonify
 from forms import DirectionsForm
 import requests
 from functionalities import get_nearest_stations, route_from_a_to_b, reverse_geocode
-from constants import CityName as cityname
-
+from constants import city_name
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -18,7 +19,7 @@ def nearest_stations():
     data = request.get_json()
     start_point = data['start_point']
     end_point = data['end_point']
-   
+
     nearest_stations = get_nearest_stations(start_point, end_point)
     print(nearest_stations)
     return jsonify(nearest_stations)
@@ -50,7 +51,7 @@ def suggestions():
     if query:
         url = 'https://nominatim.openstreetmap.org/search'
         params = {
-            'q': query + "," + cityname,
+            'q': query + "," + city_name,
             'format': 'json',
             'addressdetails': 1,
             'limit': 5
@@ -73,26 +74,22 @@ def geocode():
     display_name = reverse_geocode(lat, lng)
     return jsonify(display_name=display_name)
 
-@app.route('/best_station' , methods=["POST"])
+
+@app.route('/best_station', methods=["POST"])
 def find_closest_station():
     data = request.get_json()
     print(data)
     list_of_stations = data['list_of_stations']
     location_lat = data['lat']
     location_lon = data['lon']
-    MinTime = 100000000
-    MinStation=None
+    min_time = math.inf
+    min_station = None
     for station in list_of_stations:
         print(station)
-        dict = route_from_a_to_b([location_lat,location_lon],[station['station_lat'],station['station_lng']],'foot')
+        dict = route_from_a_to_b([location_lat, location_lon], [station['station_lat'], station['station_lng']], 'foot')
         print(dict)
         time = dict['time']
-        if(time<MinTime):
-            MinTime=time
-            MinStation=station
-    return jsonify(best_station = MinStation)
-
-
-
-
-
+        if time < min_time:
+            min_time = time
+            min_station = station
+    return jsonify(best_station=min_station)

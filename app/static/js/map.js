@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    var map = L.map('map', { zoomControl: false }).setView(WroclawCoordinates, 14);
+    var map = L.map('map', { zoomControl: false }).setView(wroclawCoordinates, 14);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -340,8 +340,6 @@ function fetchNearestStations(startPoint, endPoint) {
 
 
 
-
-
     function handleSubmit() {
         if (!startStationMarker || !endStationMarker) {
             alert("Please select both start and end stations.");
@@ -573,10 +571,10 @@ function fetchNearestStations(startPoint, endPoint) {
     }
 
     function check_if_fits_map(lat,lon) {
-        minlat = WroclawCityBounds[0]
-        maxlat = WroclawCityBounds[1]
-        minlon = WroclawCityBounds[2]
-        maxlon = WroclawCityBounds[3]
+        minlat = wroclawCityBounds[0]
+        maxlat = wroclawCityBounds[1]
+        minlon = wroclawCityBounds[2]
+        maxlon = wroclawCityBounds[3]
         console.log(minlat,maxlat,minlon,maxlon)
         if (minlat <= lat && lat <= maxlat && minlon <= lon && lon <= maxlon){
             console.log(lat,lon);
