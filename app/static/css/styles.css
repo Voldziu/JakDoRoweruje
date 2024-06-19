@@ -9,7 +9,10 @@
     flex-grow: 1;
 }
 
-
+.label-wrapper {
+    flex: 0 0 75px; /* Fixed width for labels */
+    margin-right: 10px; /* Adjust spacing between label and input */
+}
 
 
 #coords_form {

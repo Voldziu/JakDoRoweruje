@@ -4,21 +4,30 @@
     <form action="" id="coords_form">
         {{ form.hidden_tag() }}
 
-        <div class="input-with-button">
-            <label for="start-address">{{ form.start_point.label }}</label><br>
-            {{ form.start_point(size=32, class="address-input", id="start-address") }}
-            <button type="button" id="clear_start_button" class="clear-button">x</button>
+        <div class="input-group">
+            <div class="input-with-button">
+                <div class="label-wrapper">
+                    <label for="start-address">{{ form.start_point.label }}</label>
+                </div>
+                {{ form.start_point(size=32, class="address-input", id="start-address") }}
+                <button type="button" id="clear_start_button" class="clear-button">x</button>
+            </div>
+            <div class="address-hints-container">
+                <table id="address-hints-start" class="address-suggestions-table"></table>
+            </div>
         </div>
-        <div class="address-hints-container">
-            <table id="address-hints-start" class="address-suggestions-table"></table>
-        </div>
-        <div class="input-with-button">
-            <label for="end-address">{{ form.end_point.label }}</label><br>
-            {{ form.end_point(size=32, class="address-input", id="end-address") }}
-            <button type="button" id="clear_end_button" class="clear-button">x</button>
-        </div>
-        <div class="address-hints-container">
-            <table id="address-hints-end" class="address-suggestions-table"></table>
+
+        <div class="input-group">
+            <div class="input-with-button">
+                <div class="label-wrapper">
+                    <label for="end-address">{{ form.end_point.label }}</label>
+                </div>
+                {{ form.end_point(size=32, class="address-input", id="end-address") }}
+                <button type="button" id="clear_end_button" class="clear-button">x</button>
+            </div>
+            <div class="address-hints-container">
+                <table id="address-hints-end" class="address-suggestions-table"></table>
+            </div>
         </div>
 
         <div class="buttons-and-info-container">
