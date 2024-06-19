@@ -8,7 +8,7 @@ docker run  -p 5002:5000 flask:0.0.3
 
 DODAC ACTION LISTENERY DLA TYCH WSZYSTKICH MARKEROW, ZEBY BYLY ZAWSZE # jebac to #
 
-zmienic suggestions, tak zeby dalo sie wybrac miejsce bez sugestii bo wolno dzialaja # chuja wolno dzialaja, slaby internet masz #
+zmienic suggestions, tak zeby dalo sie wybrac miejsce bez sugestii bo wolno dzialaja  # chuja wolno dzialaja, slaby internet masz #
 zmienic zeby wyszukiwalo stacje tylko takie gdzie rowery sa dostepne (done)
 fajnie gdyby na boku wyswietlalo sie jak duzy dystans bedzie do przebycia i ile on w przyblizeniu zajmie minut
 Okroic mape do wroclawia

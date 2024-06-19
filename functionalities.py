@@ -24,7 +24,7 @@ def update_database():
                     if station_name in existing_stations:
                         station = existing_stations[station_name]
                         station.available_bikes = place.get('bikes', 0)
-                        print("Updating")
+
 
                     else:
                         station = Stations(station_name=station_name, station_lat=place['lat'],
@@ -81,7 +81,6 @@ def reverse_geocode(lat, lng):
         return data['display_name']
     else:
         return None
-
 
 
 def find_n_nearest_stations(coords, n, end_station=False):
@@ -146,9 +145,6 @@ def route_from_a_to_b(start_coords, end_coords, vehicle):
         distance = path.get('distance', 0)
         time = path.get('time', 0)
 
-        print(f"Route fetched successfully: {route_coords}")
-        print(f"Distance: {distance} meters, Time: {time} ms")
-
         return {
             'route': route_coords,
             'start_coords': [start_coords[0], start_coords[1]],
@@ -157,7 +153,4 @@ def route_from_a_to_b(start_coords, end_coords, vehicle):
             'time': time
         }
     else:
-        print(f"Error fetching route data: {response.status_code}, {data}")
         return {'error': 'Error fetching route data'}
-
-

@@ -1,5 +1,4 @@
 import math
-
 from app import app
 from flask import render_template, request, jsonify
 from forms import DirectionsForm
@@ -21,7 +20,6 @@ def nearest_stations():
     end_point = data['end_point']
 
     nearest_stations = get_nearest_stations(start_point, end_point)
-    print(nearest_stations)
     return jsonify(nearest_stations)
 
 
@@ -32,7 +30,6 @@ def route():
     end_coords_station = data['end_coords_station']
     start_coords = data['start_coords']
     end_coords = data['end_coords']
-    print(start_coords)
 
     from_start_to_start_station_dict = route_from_a_to_b(start_coords, start_coords_station, "foot")
     from_start_station_to_end_station_dict = route_from_a_to_b(start_coords_station, end_coords_station, "bike")
@@ -78,17 +75,14 @@ def geocode():
 @app.route('/best_station', methods=["POST"])
 def find_closest_station():
     data = request.get_json()
-    print(data)
     list_of_stations = data['list_of_stations']
     location_lat = data['lat']
     location_lon = data['lon']
     min_time = math.inf
     min_station = None
     for station in list_of_stations:
-        print(station)
-        dict = route_from_a_to_b([location_lat, location_lon], [station['station_lat'], station['station_lng']], 'foot')
-        print(dict)
-        time = dict['time']
+        dict_ = route_from_a_to_b([location_lat, location_lon], [station['station_lat'], station['station_lng']], 'foot')
+        time = dict_['time']
         if time < min_time:
             min_time = time
             min_station = station
